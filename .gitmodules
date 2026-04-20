@@ -1,3 +1,4 @@
 [submodule "cubiomes"]
 	path = cubiomes
-	url = https://github.com/Cubitect/cubiomes.git
+	url = https://github.com/aSn-Interactive/cubiomes.git
+	branch = feature/mc-1.21.5-plus
