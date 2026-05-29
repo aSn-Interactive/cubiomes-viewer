@@ -48,7 +48,7 @@ extends it for viewer-side usability.
 ### Scope
 
 - **Target**: personal / internal use, not intended as an upstream contribution.
-- **Supported MC versions**: `1.21.5`, `1.21.6` (Chase the Skies), `1.21.7`, up to `1.21.11`.
+- **Supported MC versions**: `1.21.5`, `1.21.6` (Chase the Skies), `1.21.7`, up to `1.21.11`, plus the year-based `26.1` (Tiny Takeover), `26.1.1`, `26.1.2`.
 - **Platform**: Windows 10/11 x64 built via MSYS2 UCRT64.
 - **UI language**: English (translations for other languages disabled in our build to keep the package small).
 
@@ -68,6 +68,8 @@ extends it for viewer-side usability.
 | 1.21.6  | None                   | "Chase the Skies": happy ghasts, clouds, cosmetic. |
 | 1.21.7  | None                   | Bug fixes.                                 |
 | 1.21.8–1.21.11 | None           | Hotfixes; a seed from 1.21.5 matches 1.21.11 byte-for-byte.|
+| 26.1 (Tiny Takeover) | None     | Golden dandelion, baby mob models, datapack feature-config reshuffle. No biome/structure/noise change. |
+| 26.1.1 / 26.1.2 | None          | Chat-report fix / critical hotfixes. Worldgen identical to 1.21.5+.|
 
 Consequence: a seed validated in 1.21.5 is **identical** in 1.21.11 at the
 worldgen level. The fork exposes multiple version entries only because players
@@ -357,6 +359,33 @@ Just a comment fix:
 // 1.21.4 (Winter Drop)    // was: 1.21.3 (Winter Drop Version TBA)
 case pale_garden: return QApplication::translate("Biome", "Pale Garden");
 ```
+
+### 6.2bis Year-based versioning 26.x (May 2026)
+
+Mojang switched to a `year.drop.patch` scheme in 2026: `26.1` (Tiny Takeover,
+released 2026-03-24) is the first game drop of 2026, `26.1.1` and `26.1.2` are
+its hotfixes. We verified the full changelogs: 26.1's "World Generation" section
+only reshuffles **datapack feature configuration** (flower/random_patch feature
+types removed, `trapezoid` Int Provider, `rule_based_state_provider`, tree config),
+renames `generate_features` → `generate_structures`, and moves save folders. None
+of it touches the biome climate tree, structure placement/salts, or noise that
+cubiomes emulates. **Worldgen is still frozen at the 1.21.5+ state (`btree215`).**
+
+So we exposed 26.x exactly like the 1.21.x patches — pure labels, no new btree:
+
+- `cubiomes/biomes.h`: added distinct enum values `MC_26_1`, `MC_26_1_1`,
+  `MC_26_1_2` after `MC_1_21`, and moved `MC_NEWEST = MC_26_1_2`. The btree
+  selector `if (mc >= MC_1_21_5)` in `biomenoise.c` keeps working because the new
+  values are greater than `MC_1_21_5`.
+- `cubiomes/util.c`: `mc2str()` cases `"26.1"`, `"26.1.1"`, `"26.1.2"` and the
+  matching `str2mc()` entries.
+- `cubiomes-viewer/src/config.h`: `MC_DEFAULT = MC_26_1` (fresh users land on the
+  current game drop).
+- `cubiomes-viewer/src/mainwindow.cpp`: hid `MC_26_1_1` behind the experimental
+  toggle (identical worldgen); `26.1` and `26.1.2` stay visible by default.
+
+We kept the `MC_1_21_*` family rather than renaming everything to the year format,
+to stay close to upstream and avoid touching every `>=` version gate.
 
 ### 6.3 Files to revisit after a major upstream update
 
