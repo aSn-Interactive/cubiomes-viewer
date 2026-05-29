@@ -15,7 +15,7 @@
 
 #define PRECOMPUTE48_BUFSIZ ((int64_t)1 << 30)
 
-enum { MC_DEFAULT = MC_1_21 };
+enum { MC_DEFAULT = MC_26_1 };
 
 struct ExtGenConfig
 {
